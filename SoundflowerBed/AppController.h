@@ -22,8 +22,11 @@
 	NSMenuItem		*mCur2chBufferSize;
 	NSMenuItem		*mCur16chBufferSize;
 	
-	NSMenuItem		*mSuspended2chDevice;
-	NSMenuItem		*mSuspended16chDevice;
+	//NSMenuItem		*mSuspended2chDevice;
+	//NSMenuItem		*mSuspended16chDevice;
+    
+    AudioDeviceID   mSuspended2chDeviceID;
+    AudioDeviceID   mSuspended16chDeviceID;
 	
 	AudioDeviceID				mSoundflower2Device;
 	AudioDeviceID				mSoundflower16Device;
@@ -33,8 +36,8 @@
 	UInt32 mNchnls2;
 	UInt32 mNchnls16;
 	
-	UInt32 mMenuID2[64];
-	UInt32 mMenuID16[64];
+	AudioDeviceID mMenuID2[64];
+	AudioDeviceID mMenuID16[64];
 	
 	IBOutlet HelpWindowController *mAboutController;
 }

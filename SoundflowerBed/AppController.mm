@@ -27,20 +27,21 @@ printf("HardwareListenerProc\n");
     switch(inPropertyID)
     { 
         case kAudioHardwarePropertyDevices:
-//			printf("kAudioHardwarePropertyDevices\n");	
+//			printf("kAudioHardwarePropertyDevices\n");
 			
        		// An audio device has been added or removed to the system, so lets just start over
-			[NSThread detachNewThreadSelector:@selector(refreshDevices) toTarget:app withObject:nil];	
+            //[NSThread detachNewThreadSelector:@selector(refreshDevices) toTarget:app withObject:nil];
+            [app refreshDevices];
             break;
 			
         case kAudioHardwarePropertyIsInitingOrExiting:
-//		printf("kAudioHardwarePropertyIsInitingOrExiting\n");
+		printf("kAudioHardwarePropertyIsInitingOrExiting\n");
                        // A UInt32 whose value will be non-zero if the HAL is either in the midst of
                         //initializing or in the midst of exiting the process.
             break;
 			
         case kAudioHardwarePropertySleepingIsAllowed:
-//		printf("kAudioHardwarePropertySleepingIsAllowed\n");
+		printf("kAudioHardwarePropertySleepingIsAllowed\n");
                     //    A UInt32 where 1 means that the process will allow the CPU to idle sleep
                     //    even if there is audio IO in progress. A 0 means that the CPU will not be
                     //    allowed to idle sleep. Note that this property won't affect when the CPU is
@@ -48,7 +49,7 @@ printf("HardwareListenerProc\n");
             break;
 			
         case kAudioHardwarePropertyUnloadingIsAllowed:
-//		printf("kAudioHardwarePropertyUnloadingIsAllowed\n");
+		printf("kAudioHardwarePropertyUnloadingIsAllowed\n");
                      //   A UInt32 where 1 means that this process wants the HAL to unload itself
                      //   after a period of inactivity where there are no IOProcs and no listeners
                      //   registered with any AudioObject.
@@ -73,18 +74,25 @@ OSStatus	DeviceListenerProc (	AudioDeviceID           inDevice,
 			//printf("kAudioDevicePropertyNominalSampleRate\n");	
 			if (isInput) {
 				//printf("soundflower device potential sample rate change\n");	
-				if (gThruEngine2->IsRunning() && gThruEngine2->GetInputDevice() == inDevice)	
-					[NSThread detachNewThreadSelector:@selector(srChanged2ch) toTarget:app withObject:nil];
-				else if (gThruEngine16->IsRunning() && gThruEngine16->GetInputDevice() == inDevice)	
-					[NSThread detachNewThreadSelector:@selector(srChanged16ch) toTarget:app withObject:nil];
-			} 
+				if (gThruEngine2->IsRunning() && gThruEngine2->GetInputDevice() == inDevice){
+					//[NSThread detachNewThreadSelector:@selector(srChanged2ch) toTarget:app withObject:nil];
+                    [app srChanged2ch];
+                }else if (gThruEngine16->IsRunning() && gThruEngine16->GetInputDevice() == inDevice){
+					//[NSThread detachNewThreadSelector:@selector(srChanged16ch) toTarget:app withObject:nil];
+                    [app srChanged16ch];
+                }
+			}
 			else {
 				if (inChannel == 0) {
 					//printf("non-soundflower device potential sample rate change\n");
-					if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice)
-						[NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
-					else if (gThruEngine16->IsRunning() && gThruEngine16->GetOutputDevice() == inDevice)
-						[NSThread detachNewThreadSelector:@selector(srChanged16chOutput) toTarget:app withObject:nil];
+					if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice){
+						//[NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
+                        [app srChanged2chOutput];
+                    }else if (gThruEngine16->IsRunning() && gThruEngine16->GetOutputDevice() == inDevice){
+                        //[NSThread detachNewThreadSelector:@selector(srChanged16chOutput) toTarget:app withObject:nil];
+                        [app srChanged16chOutput];
+                    
+                    }
 				}
 			}
 			break;
@@ -99,10 +107,13 @@ OSStatus	DeviceListenerProc (	AudioDeviceID           inDevice,
 				
 		case kAudioDevicePropertyDataSource:
 			// printf("DeviceListenerProc : HEADPHONES! \n");	
-			if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice)
-				[NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
-			else if (gThruEngine16->IsRunning() && gThruEngine16->GetOutputDevice() == inDevice)
-				[NSThread detachNewThreadSelector:@selector(srChanged16chOutput) toTarget:app withObject:nil];
+			if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice){
+				//[NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
+                [app srChanged2chOutput];
+            }else if (gThruEngine16->IsRunning() && gThruEngine16->GetOutputDevice() == inDevice){
+				//[NSThread detachNewThreadSelector:@selector(srChanged16chOutput) toTarget:app withObject:nil];
+                [app srChanged16chOutput];
+            }
 			break;
 			
 		case kAudioDevicePropertyDeviceIsRunning:
@@ -132,10 +143,13 @@ OSStatus	DeviceListenerProc (	AudioDeviceID           inDevice,
 				if (inChannel == 0) {
 					if (gThruEngine2->GetOutputDevice() == inDevice || gThruEngine16->GetOutputDevice() == inDevice) {
 						//printf("non-soundflower device potential # of chnls change\n");
-						[NSThread detachNewThreadSelector:@selector(checkNchnls) toTarget:app withObject:nil];
+						//[NSThread detachNewThreadSelector:@selector(checkNchnls) toTarget:app withObject:nil];
+                        [app checkNchnls];
 					}
-					else // this could be an aggregate device in the middle of constructing, going from/to 0 chans & we need to add/remove to menu
-						[NSThread detachNewThreadSelector:@selector(refreshDevices) toTarget:app withObject:nil];	
+					else{ // this could be an aggregate device in the middle of constructing, going from/to 0 chans & we need to add/remove to menu
+						//[NSThread detachNewThreadSelector:@selector(refreshDevices) toTarget:app withObject:nil];
+                        [app refreshDevices];
+                    }
 				}
 			}
 			break;
@@ -166,8 +180,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
         case kIOMessageSystemWillSleep:
 		    //printf("kIOMessageSystemWillSleep\n");
 
-			[NSThread detachNewThreadSelector:@selector(suspend) toTarget:app withObject:nil];
-			
+            [app suspend];
             IOAllowPowerChange(root_port, (long)messageArgument);
             break;
 			
@@ -191,8 +204,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 
         case kIOMessageSystemHasPoweredOn:
 			//printf("kIOMessageSystemHasPoweredOn\n");
-	
-			[NSTimer scheduledTimerWithTimeInterval:0.0 target:app selector:@selector(resume) userInfo:nil repeats:NO];
+            [NSTimer scheduledTimerWithTimeInterval:1.0 target:app selector:@selector(resume) userInfo:nil repeats:NO];
 		
 			break;
 			
@@ -204,32 +216,61 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 
 - (IBAction)suspend
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-	mSuspended2chDevice = mCur2chDevice;
-	mSuspended16chDevice = mCur16chDevice;
-	
-	[self outputDeviceSelected:[mMenu itemAtIndex:1]];
-	[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+1)]];
-	
-	[pool release];
+    //printf("begin suspend\n");
+    mSuspended2chDeviceID = gThruEngine2->GetOutputDevice();
+    //gThruEngine2->SetOutputDevice(kAudioDeviceUnknown);
+    [self outputDeviceSelected:[mMenu itemAtIndex:1]];
+    
+    mSuspended16chDeviceID = gThruEngine16->GetOutputDevice();
+    //gThruEngine16->SetOutputDevice(kAudioDeviceUnknown);
+    [self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex+1]];
+    //printf("return suspend\n");
 }
 
 - (IBAction)resume
 {
-	//NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	if (mSuspended2chDevice) {
-		[self outputDeviceSelected:mSuspended2chDevice];
-		mCur2chDevice = mSuspended2chDevice;
-		mSuspended2chDevice = NULL;
-	}
-	if (mSuspended16chDevice) {
-		[self outputDeviceSelected:mSuspended16chDevice];
-		mCur16chDevice = mSuspended16chDevice;
-		mSuspended16chDevice = NULL;
-	}
-	
-	//[pool release];
+    //printf("resume\n");
+    
+    if (mSuspended2chDeviceID == kAudioDeviceUnknown && mSuspended16chDeviceID == kAudioDeviceUnknown){
+        return;
+    }
+    
+    [self refreshDevices];
+    
+    if (mSuspended2chDeviceID != kAudioDeviceUnknown){
+        //find index for suspended device ID
+    
+        int index = -1;
+        for (int i = 0 ; i < 64 ; i++){
+            if (mMenuID2[i] == mSuspended2chDeviceID){
+                index = i;
+                break;
+            }
+        }
+        if (index < 0){
+            printf("device disconnected while sleep");
+        }else{
+            [self outputDeviceSelected:[mMenu itemAtIndex:index+2]];
+        }
+    }
+
+    if (mSuspended16chDeviceID != kAudioDeviceUnknown){
+        //find index for suspended device ID
+        
+        int index = -1;
+        for (int i = 0 ; i < 64 ; i++){
+            if (mMenuID16[i] == mSuspended16chDeviceID){
+                index = i;
+                break;
+            }
+        }
+        if (index < 0){
+            printf("device disconnected while sleep");
+        }else{
+            [self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex+index + 2]];
+        }
+    }
+    
 }
 
 
@@ -338,8 +379,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[self buildDeviceList];		
-	
+	[self buildDeviceList];
 	[mSbItem setMenu:nil];
 	[mMenu dealloc];
 	
@@ -349,22 +389,48 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	AudioDeviceID dev = gThruEngine2->GetOutputDevice();
 	AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
 	AudioDeviceList::DeviceList::iterator i;
-	for (i = thelist.begin(); i != thelist.end(); ++i)
-		if ((*i).mID == dev) 
-			break;
-	if (i == thelist.end()) // we didn't find it, turn selection to none
-		[self outputDeviceSelected:[mMenu itemAtIndex:1]];
-	else
+	for (i = thelist.begin(); i != thelist.end(); ++i){
+		if ((*i).mID == dev) {
+            break;
+        }
+    }
+	if (i == thelist.end()){ // we didn't find it, turn selection to none
+        [self outputDeviceSelected:[mMenu itemAtIndex:1]];
+    }else{
+        [[mMenu itemAtIndex:1] setState:NSOffState];
+        
+        for (int i = 0 ; i < 64 ; i++){
+            if (mMenuID2[i] == dev){
+                mCur2chDevice = [mMenu itemAtIndex:i+2];
+                break;
+            }
+        }
+        
+		[mCur2chDevice setState:NSOnState];
 		[self buildRoutingMenu:YES];
-		
+	}
+    
 	dev = gThruEngine16->GetOutputDevice();
-	for ( i= thelist.begin(); i != thelist.end(); ++i)
-		if ((*i).mID == dev) 
+	for ( i= thelist.begin(); i != thelist.end(); ++i){
+		if ((*i).mID == dev){
 			break;
+        }
+    }
 	if (i == thelist.end()) // we didn't find it, turn selection to none
 		[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+1)]];
-	else
+	else{
+        [[mMenu itemAtIndex:m16StartIndex+1] setState:NSOffState];
+        
+        for (int i = 0; i < 64; i++){
+            if (mMenuID16[i] == dev){
+                mCur16chDevice = [mMenu itemAtIndex:(m16StartIndex+i+2)];
+                break;
+            }
+        }
+        
+		[mCur16chDevice setState:NSOnState];
 		[self buildRoutingMenu:NO];
+    }
 
 	[pool release];
 }
@@ -451,8 +517,8 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	mNchnls2 = 0;
 	mNchnls16 = 0;
 	
-	mSuspended2chDevice = NULL;
-	mSuspended16chDevice = NULL;
+	//mSuspended2chDevice = NULL;
+	//mSuspended16chDevice = NULL;
 	
 	return self;
 }
@@ -515,6 +581,9 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	NSMenuItem *item;
 
 	mMenu = [[NSMenu alloc] initWithTitle:@"Main Menu"];
+    for (int i = 0; i < 64; i++){
+        mMenuID2[i] = 0;
+    }
 		
 	if (mSoundflower2Device) {
 		m2chMenu = [mMenu addItemWithTitle:@"Soundflower (2ch)" action:@selector(doNothing) keyEquivalent:@""];
@@ -689,8 +758,18 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 		delete mOutputDeviceList;
 	}
 	
+    
+    //Sometimes selecting "Airplay" causes empty device list for a while and then
+    //changes all DeviceID(CoreAudio Restarted??), In that case we need retart
+    Boolean restartRequired = false;
 	mOutputDeviceList = new AudioDeviceList(false);
-	[ self InstallListeners];
+    while(mOutputDeviceList->GetList().size() == 0){
+        restartRequired = true;
+        delete mOutputDeviceList;
+        [NSThread sleepForTimeInterval:0.1];
+        mOutputDeviceList = new AudioDeviceList(false);
+        NSLog(@"----------waiting for devices");
+    }
 	
 	// find soundflower devices, store and remove them from our output list
 	AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
@@ -709,6 +788,29 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			thelist.erase(toerase);
 		}
 	}
+    
+    if (restartRequired){
+        NSLog(@"restarting Thru Engines");
+        if (mSoundflower2Device && mSoundflower16Device) {
+            if(gThruEngine2){
+                delete gThruEngine2;
+            }
+            gThruEngine2 = new AudioThruEngine;
+            gThruEngine2->SetInputDevice(mSoundflower2Device);
+            
+            if(gThruEngine16){
+                delete gThruEngine16;
+            }
+            gThruEngine16 = new AudioThruEngine;
+            gThruEngine16->SetInputDevice(mSoundflower16Device);
+            
+            gThruEngine2->Start();
+            gThruEngine16->Start();
+        }
+    }
+    
+    [self InstallListeners];
+    
 }
 
 - (void)awakeFromNib
