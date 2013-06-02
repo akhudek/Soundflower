@@ -626,8 +626,10 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 		
 		[m2chMenu setSubmenu:submenu];
 	
-	
-		
+        NSMenuItem *volumeMenu = [mMenu addItemWithTitle:@"Volume2" action:
+                @selector(doNothing) keyEquivalent:@""];
+        [volumeMenu setView:[mVolumeViewController2ch view]];
+        
 		item = [mMenu addItemWithTitle:@"None (OFF)" action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 		[item setTarget:self];
 		[item setState:NSOnState];
@@ -714,7 +716,10 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			item = [submenu addItemWithTitle:@"Channel 16" action:@selector(doNothing) keyEquivalent:@""];
 			[item setTarget:self];	
 		[m16chMenu setSubmenu:submenu];
-	
+        
+        NSMenuItem *volumeMenu2 = [mMenu addItemWithTitle:@"Volume16" action:
+                                   @selector(doNothing) keyEquivalent:@""];
+        [volumeMenu2 setView:[mVolumeViewController16ch view]];
 	
 		item = [mMenu addItemWithTitle:@"None (OFF)" action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 		[item setTarget:self];
@@ -816,6 +821,10 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 - (void)awakeFromNib
 {
 	[[NSApplication sharedApplication] setDelegate:self];
+    
+    mVolumeViewController2ch = [[VolumeViewController alloc] initWithNibName:@"VolumeView" bundle:nil];
+    mVolumeViewController16ch = [[VolumeViewController alloc] initWithNibName:@"VolumeView" bundle:nil];
+
 	
 	[self buildDeviceList];
 	

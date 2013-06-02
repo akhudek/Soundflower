@@ -29,6 +29,11 @@
 		222FE3490EBB6D9900FD13FC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		222FE34A0EBB6D9900FD13FC /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F591DD8D0310AAC801FEEC38 /* CoreAudio.framework */; };
 		222FE34B0EBB6D9900FD13FC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9E9CD2F08E78DA30024DA5B /* IOKit.framework */; };
+		EB6C9F5D175A3004003CD86F /* VolumeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = EB6C9F5C175A3004003CD86F /* VolumeView.xib */; };
+		EB6C9F60175A3052003CD86F /* VolumeView.h in Headers */ = {isa = PBXBuildFile; fileRef = EB6C9F5E175A3052003CD86F /* VolumeView.h */; };
+		EB6C9F61175A3052003CD86F /* VolumeView.m in Sources */ = {isa = PBXBuildFile; fileRef = EB6C9F5F175A3052003CD86F /* VolumeView.m */; };
+		EB6C9F64175A37F8003CD86F /* VolumeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = EB6C9F62175A37F8003CD86F /* VolumeViewController.h */; };
+		EB6C9F65175A37F8003CD86F /* VolumeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EB6C9F63175A37F8003CD86F /* VolumeViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +51,11 @@
 		C9CCA5E806ED143E0076FAC2 /* menuIcon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = menuIcon.tiff; sourceTree = "<group>"; };
 		C9CFAC1E06EFA390001BE11F /* appIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = appIcon.icns; sourceTree = "<group>"; };
 		C9E9CD2F08E78DA30024DA5B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		EB6C9F5C175A3004003CD86F /* VolumeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VolumeView.xib; sourceTree = "<group>"; };
+		EB6C9F5E175A3052003CD86F /* VolumeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VolumeView.h; sourceTree = "<group>"; };
+		EB6C9F5F175A3052003CD86F /* VolumeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VolumeView.m; sourceTree = "<group>"; };
+		EB6C9F62175A37F8003CD86F /* VolumeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VolumeViewController.h; sourceTree = "<group>"; };
+		EB6C9F63175A37F8003CD86F /* VolumeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VolumeViewController.m; sourceTree = "<group>"; };
 		F573070B03117CCD01FEEC38 /* AudioDeviceList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AudioDeviceList.h; sourceTree = "<group>"; };
 		F573070C03117CCD01FEEC38 /* AudioDeviceList.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AudioDeviceList.cpp; sourceTree = "<group>"; };
 		F57307570312E91E01FEEC38 /* HelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = HelpWindowController.m; sourceTree = "<group>"; };
@@ -90,6 +100,10 @@
 				F591DDB70311589801FEEC38 /* AudioThruEngine.cpp */,
 				F573070B03117CCD01FEEC38 /* AudioDeviceList.h */,
 				F573070C03117CCD01FEEC38 /* AudioDeviceList.cpp */,
+				EB6C9F5E175A3052003CD86F /* VolumeView.h */,
+				EB6C9F5F175A3052003CD86F /* VolumeView.m */,
+				EB6C9F62175A37F8003CD86F /* VolumeViewController.h */,
+				EB6C9F63175A37F8003CD86F /* VolumeViewController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -150,6 +164,7 @@
 				C9CCA5E706ED143E0076FAC2 /* sf2.tiff */,
 				C9CCA5E806ED143E0076FAC2 /* menuIcon.tiff */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
+				EB6C9F5C175A3004003CD86F /* VolumeView.xib */,
 				229B366F0EDC1DB500623222 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 			);
@@ -178,6 +193,8 @@
 				222FE3360EBB6D9900FD13FC /* AudioDeviceList.h in Headers */,
 				222FE3370EBB6D9900FD13FC /* AudioRingBuffer.h in Headers */,
 				222FE3380EBB6D9900FD13FC /* HelpWindowController.h in Headers */,
+				EB6C9F60175A3052003CD86F /* VolumeView.h in Headers */,
+				EB6C9F64175A37F8003CD86F /* VolumeViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -238,6 +255,7 @@
 				222FE33D0EBB6D9900FD13FC /* sf2.tiff in Resources */,
 				222FE33E0EBB6D9900FD13FC /* menuIcon.tiff in Resources */,
 				222FE33F0EBB6D9900FD13FC /* appIcon.icns in Resources */,
+				EB6C9F5D175A3004003CD86F /* VolumeView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,6 +273,8 @@
 				222FE3450EBB6D9900FD13FC /* AudioThruEngine.cpp in Sources */,
 				222FE3460EBB6D9900FD13FC /* AudioDeviceList.cpp in Sources */,
 				222FE3470EBB6D9900FD13FC /* HelpWindowController.m in Sources */,
+				EB6C9F61175A3052003CD86F /* VolumeView.m in Sources */,
+				EB6C9F65175A37F8003CD86F /* VolumeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

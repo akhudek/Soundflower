@@ -2,6 +2,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "HelpWindowController.h"
+#import "VolumeView.h"
+#import "VolumeViewController.h"
 #include "AudioDeviceList.h"
 
 
@@ -40,6 +42,9 @@
 	AudioDeviceID mMenuID16[64];
 	
 	IBOutlet HelpWindowController *mAboutController;
+    //IBOutlet VolumeView *mVolumeView;
+    id mVolumeViewController2ch;
+    id mVolumeViewController16ch;
 }
 
 - (IBAction)suspend;
