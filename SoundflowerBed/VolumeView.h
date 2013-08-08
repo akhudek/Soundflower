@@ -8,6 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VolumeView : NSView
-
+@interface VolumeView : NSView{
+    IBOutlet NSSlider *mSlider;
+    IBOutlet NSTextField *mLabel;
+}
+- (void)setScalar:(float)scalar;
+- (void)setDB:(float)db;
 @end

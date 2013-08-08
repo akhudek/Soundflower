@@ -17,6 +17,7 @@
 	NSMenu			*m16chBuffer;
     
 	BOOL			menuItemVisible;
+    int             m2StartIndex;   //Menu Index of "None"
 	int				m16StartIndex;
 	
 	NSMenuItem		*mCur2chDevice;
@@ -55,6 +56,7 @@
 - (IBAction)srChanged2chOutput;
 - (IBAction)srChanged16chOutput;
 - (IBAction)checkNchnls;
+- (IBAction)volChanged2ch;
 
 - (IBAction)refreshDevices;
 

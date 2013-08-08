@@ -5,6 +5,9 @@
 
 #include "AudioThruEngine.h"
 
+#include <CoreServices/CoreServices.h>
+#include <CoreAudio/CoreAudio.h>
+
 @implementation AppController
 
 AudioThruEngine	*gThruEngine2 = NULL;
@@ -106,7 +109,7 @@ OSStatus	DeviceListenerProc (	AudioDeviceID           inDevice,
 			break;
 				
 		case kAudioDevicePropertyDataSource:
-			// printf("DeviceListenerProc : HEADPHONES! \n");	
+			// printf("DeviceListenerProc : HEADPHONES! \n");
 			if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice){
 				//[NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
                 [app srChanged2chOutput];
@@ -115,6 +118,13 @@ OSStatus	DeviceListenerProc (	AudioDeviceID           inDevice,
                 [app srChanged16chOutput];
             }
 			break;
+            
+        case kAudioDevicePropertyVolumeScalar:
+            NSLog(@"kAudioDevicePropertyVolumeScalar");
+            if (gThruEngine2->GetOutputDevice() == inDevice){
+                [app volChanged2ch];
+            }
+            break;
 			
 		case kAudioDevicePropertyDeviceIsRunning:
 //			printf("kAudioDevicePropertyDeviceIsRunning\n");	
@@ -219,11 +229,11 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     //printf("begin suspend\n");
     mSuspended2chDeviceID = gThruEngine2->GetOutputDevice();
     //gThruEngine2->SetOutputDevice(kAudioDeviceUnknown);
-    [self outputDeviceSelected:[mMenu itemAtIndex:1]];
+    [self outputDeviceSelected:[mMenu itemAtIndex:m2StartIndex]];
     
     mSuspended16chDeviceID = gThruEngine16->GetOutputDevice();
     //gThruEngine16->SetOutputDevice(kAudioDeviceUnknown);
-    [self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex+1]];
+    [self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex]];
     //printf("return suspend\n");
 }
 
@@ -250,7 +260,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
         if (index < 0){
             printf("device disconnected while sleep");
         }else{
-            [self outputDeviceSelected:[mMenu itemAtIndex:index+2]];
+            [self outputDeviceSelected:[mMenu itemAtIndex:m2StartIndex+1+index]];
         }
     }
 
@@ -267,7 +277,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
         if (index < 0){
             printf("device disconnected while sleep");
         }else{
-            [self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex+index + 2]];
+            [self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex+1+index]];
         }
     }
     
@@ -282,7 +292,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	OSStatus err = gThruEngine2->MatchSampleRate(true);
 			
 	NSMenuItem		*curdev = mCur2chDevice;
-	[self outputDeviceSelected:[mMenu itemAtIndex:1]];
+	[self outputDeviceSelected:[mMenu itemAtIndex:m2StartIndex]];
 	if (err == kAudioHardwareNoError) {
 		//usleep(1000);
 		[self outputDeviceSelected:curdev];
@@ -302,7 +312,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	OSStatus err = gThruEngine16->MatchSampleRate(true);
 
 	NSMenuItem *curdev = mCur16chDevice;
-	[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+1)]];
+	[self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex]];
 	if (err == kAudioHardwareNoError) {
 		//usleep(1000);
 		[self outputDeviceSelected:curdev];
@@ -321,7 +331,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			
 	// restart devices
 	NSMenuItem		*curdev = mCur2chDevice;
-	[self outputDeviceSelected:[mMenu itemAtIndex:1]];
+	[self outputDeviceSelected:[mMenu itemAtIndex:m2StartIndex]];
 	if (err == kAudioHardwareNoError) {
 		//usleep(1000);
 		[self outputDeviceSelected:curdev];
@@ -340,7 +350,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			
 	// restart devices
 	NSMenuItem	*curdev = mCur16chDevice;
-	[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+1)]];
+	[self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex]];
 	if (err == kAudioHardwareNoError) {
 		//usleep(1000);
 		[self outputDeviceSelected:curdev];
@@ -358,7 +368,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	if (mNchnls2 != gThruEngine2->GetOutputNchnls())
 	 {
 		NSMenuItem	*curdev = mCur2chDevice;
-		[self outputDeviceSelected:[mMenu itemAtIndex:1]];
+		[self outputDeviceSelected:[mMenu itemAtIndex:m2StartIndex]];
 		//usleep(1000);
 		[self outputDeviceSelected:curdev];
 	}
@@ -366,7 +376,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	if (mNchnls16 != gThruEngine16->GetOutputNchnls()) 
 	{
 		NSMenuItem	*curdev = mCur16chDevice;
-		[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+1)]];
+		[self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex]];
 		//usleep(1000);
 		[self outputDeviceSelected:curdev];
 	}
@@ -381,7 +391,8 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	
 	[self buildDeviceList];
 	[mSbItem setMenu:nil];
-	[mMenu dealloc];
+	//[mMenu dealloc];
+    [mMenu release];
 	
 	[self buildMenu];
 	
@@ -394,19 +405,30 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
             break;
         }
     }
+    
 	if (i == thelist.end()){ // we didn't find it, turn selection to none
-        [self outputDeviceSelected:[mMenu itemAtIndex:1]];
+        [self outputDeviceSelected:[mMenu itemAtIndex:m2StartIndex]];
     }else{
-        [[mMenu itemAtIndex:1] setState:NSOffState];
+        [[mMenu itemAtIndex:m2StartIndex] setState:NSOffState];
         
         for (int i = 0 ; i < 64 ; i++){
             if (mMenuID2[i] == dev){
-                mCur2chDevice = [mMenu itemAtIndex:i+2];
+                mCur2chDevice = [mMenu itemAtIndex:m2StartIndex+1+i];
                 break;
             }
         }
         
 		[mCur2chDevice setState:NSOnState];
+        
+        AudioDevice outDevice(dev,false);
+        VolumeView *volumeView = (VolumeView *)[mVolumeViewController2ch view];
+        if (outDevice.IsVolumeAvailableForMaster() || outDevice.IsVolumeAvailableForChannels()){
+            [volumeView setEnabled:true];
+            float scalar = outDevice.GetVolumeScalar();
+            float db = outDevice.GetVolumeDB();
+            [volumeView setScalar: scalar];
+            [volumeView setDB: db];
+        }
 		[self buildRoutingMenu:YES];
 	}
     
@@ -417,13 +439,13 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
         }
     }
 	if (i == thelist.end()) // we didn't find it, turn selection to none
-		[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+1)]];
+		[self outputDeviceSelected:[mMenu itemAtIndex:m16StartIndex]];
 	else{
-        [[mMenu itemAtIndex:m16StartIndex+1] setState:NSOffState];
+        [[mMenu itemAtIndex:m16StartIndex] setState:NSOffState];
         
         for (int i = 0; i < 64; i++){
             if (mMenuID16[i] == dev){
-                mCur16chDevice = [mMenu itemAtIndex:(m16StartIndex+i+2)];
+                mCur16chDevice = [mMenu itemAtIndex:(m16StartIndex+1+i)];
                 break;
             }
         }
@@ -470,6 +492,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			// this provides us, for example, with notification when the headphones are plugged/unplugged during playback
 			verify_noerr (AudioDeviceAddPropertyListener((*i).mID, 0, false, kAudioDevicePropertyDataSource, DeviceListenerProc, self));
 
+			verify_noerr (AudioDeviceAddPropertyListener((*i).mID, 1, false, kAudioDevicePropertyVolumeScalar, DeviceListenerProc, self));
 		}
 	}
 		
@@ -626,14 +649,18 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 		
 		[m2chMenu setSubmenu:submenu];
 	
+        //Volume Slider
         NSMenuItem *volumeMenu = [mMenu addItemWithTitle:@"Volume2" action:
                 @selector(doNothing) keyEquivalent:@""];
         [volumeMenu setView:[mVolumeViewController2ch view]];
+        [[mVolumeViewController2ch view] setEnabled:false];
         
 		item = [mMenu addItemWithTitle:@"None (OFF)" action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 		[item setTarget:self];
 		[item setState:NSOnState];
-		mCur2chDevice = item;
+		m2StartIndex = [mMenu indexOfItem:item];
+        mCur2chDevice = item;
+        
 		
 		AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
 		int index = 0;
@@ -641,7 +668,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			AudioDevice ad((*i).mID, false);
 			if (ad.CountChannels()) 
 			{
-				item = [mMenu addItemWithTitle:[NSString stringWithCString: (*i).mName] action:@selector(outputDeviceSelected:) keyEquivalent:@""];
+				item = [mMenu addItemWithTitle:[NSString stringWithUTF8String: (*i).mName] action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 				[item setTarget:self];
 				mMenuID2[index++] = (*i).mID;
 			}
@@ -660,7 +687,6 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 		m16chMenu = [mMenu addItemWithTitle:@"Soundflower (64ch)" action:@selector(doNothing) keyEquivalent:@""];
 		[m16chMenu setImage:[NSImage imageNamed:@"sf16"]];
 		[m16chMenu setTarget:self];
-		m16StartIndex = [mMenu indexOfItem:m16chMenu];
 			NSMenu *submenu = [[NSMenu alloc] initWithTitle:@"16ch submenu"];
 				NSMenuItem *bufItem = [submenu addItemWithTitle:@"Buffer Size" action:@selector(doNothing) keyEquivalent:@""];
 				m16chBuffer = [[NSMenu alloc] initWithTitle:@"16ch Buffer"];
@@ -720,11 +746,13 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
         NSMenuItem *volumeMenu2 = [mMenu addItemWithTitle:@"Volume16" action:
                                    @selector(doNothing) keyEquivalent:@""];
         [volumeMenu2 setView:[mVolumeViewController16ch view]];
-	
+        [[mVolumeViewController16ch view] setEnabled:false];
+        
 		item = [mMenu addItemWithTitle:@"None (OFF)" action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 		[item setTarget:self];
 		[item setState:NSOnState];
-		mCur16chDevice = item;
+		m16StartIndex = [mMenu indexOfItem:item];
+        mCur16chDevice = item;
 		
 		AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
 		int index = 0;
@@ -732,7 +760,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			AudioDevice ad((*i).mID, false);
 			if (ad.CountChannels()) 
 			{
-				item = [mMenu addItemWithTitle:[NSString stringWithCString: (*i).mName] action:@selector(outputDeviceSelected:) keyEquivalent:@""];
+				item = [mMenu addItemWithTitle:[NSString stringWithUTF8String: (*i).mName] action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 				[item setTarget:self];	
 				mMenuID16[index++] = (*i).mID;
 			}
@@ -823,6 +851,9 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	[[NSApplication sharedApplication] setDelegate:self];
     
     mVolumeViewController2ch = [[VolumeViewController alloc] initWithNibName:@"VolumeView" bundle:nil];
+    NSSlider *slider = (NSSlider *)[[mVolumeViewController2ch view] slider];
+    [slider setTarget:self];
+    [slider setAction:@selector(setVolume2ch:)];
     mVolumeViewController16ch = [[VolumeViewController alloc] initWithNibName:@"VolumeView" bundle:nil];
 
 	
@@ -965,12 +996,44 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	[self writeDevicePrefs:NO];
 }
 
+- (IBAction)volChanged2ch
+{
+    AudioDeviceID outDevID = gThruEngine2->GetOutputDevice();
+    if (outDevID == kAudioDeviceUnknown){
+        return;
+    }
+    
+    AudioDevice device(outDevID, false);
+    VolumeView *view = (VolumeView *)[mVolumeViewController2ch view];
+    [view setScalar:device.GetVolumeScalar()];
+    [view setDB:device.GetVolumeDB()];
+}
+
+- (IBAction)setVolume2ch:(id)sender
+{
+    NSSlider *slider = (NSSlider *)sender;
+    NSLog(@"vol changed to %f",[slider floatValue]);
+    //
+    
+    AudioDeviceID outDevID = gThruEngine2->GetOutputDevice();
+    if (outDevID == kAudioDeviceUnknown){
+        return;
+    }
+    
+    AudioDevice device(outDevID,false);
+    
+    device.SetVolumeScalar([slider floatValue]);
+    VolumeView *view = (VolumeView *)[sender superview];
+    [view setDB:device.GetVolumeDB()];
+    
+}
+
 - (IBAction)outputDeviceSelected:(id)sender
 {
 	int val = [mMenu indexOfItem:sender];
 	if (val < m16StartIndex) {
-		val -= 2;
-		
+		//val -= 2;
+		val -= (m2StartIndex + 1);
 		// if 'None' was selected, our val will be == -1, which will return a NULL
 		// device from the list, which is what we want anyway, and seems to work
 		// here -- probably should check to see if there are any potential problems
@@ -987,9 +1050,24 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	
 		// now set the menu
 		[self buildRoutingMenu:YES];
+        
+        //
+        AudioDevice outDevice((val <0 ? kAudioDeviceUnknown : mMenuID2[val]), false);
+        VolumeView *volumeView = (VolumeView *)[mVolumeViewController2ch view];
+        [volumeView setEnabled:false];
+        if (outDevice.mID != kAudioDeviceUnknown){
+            if (outDevice.IsVolumeAvailableForMaster() || outDevice.IsVolumeAvailableForChannels()){
+                [volumeView setEnabled:true];
+                float scalar = outDevice.GetVolumeScalar();
+                float db = outDevice.GetVolumeDB();
+                [volumeView setScalar: scalar];
+                [volumeView setDB: db];
+            }
+        }
 	}
 	else {
-		val -= (m16StartIndex+2);
+		//val -= (m16StartIndex+2);
+        val -= (m16StartIndex+1);
 		
 		// if 'None' was selected, our val will be == -1, which will return a NULL
 		// device from the list, which is what we want anyway, and seems to work
@@ -1037,7 +1115,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 		// make calculations based on index #
 		int index = [mMenu indexOfItemWithTitle:[NSString stringWithCString:name]];
 		if (index >= 0)
-			[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+index)]];
+			[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+index-m2StartIndex)]];
 	}
 	
 	CFNumberRef num = (CFNumberRef) CFPreferencesCopyAppValue(CFSTR("2ch Buffer Size"), kCFPreferencesCurrentApplication);

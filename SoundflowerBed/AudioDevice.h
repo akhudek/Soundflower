@@ -57,6 +57,12 @@ public:
 	
 	void	SetBufferSize(UInt32 size);
 	OSStatus SetSampleRate(Float64 sr);
+    
+    void    SetVolumeScalar(float val);
+    float   GetVolumeScalar();
+    float   GetVolumeDB();
+    bool    IsVolumeAvailableForMaster();
+    bool    IsVolumeAvailableForChannels();
 	
 	void	UpdateFormat();
 	
@@ -68,7 +74,8 @@ public:
 	bool							mIsInput;
 	UInt32							mSafetyOffset;
 	UInt32							mBufferSizeFrames;
-	AudioStreamBasicDescription		mFormat;	
+	AudioStreamBasicDescription		mFormat;
+ 
 };
 
 

@@ -137,7 +137,7 @@ OSStatus AudioThruEngine::MatchSampleRate(bool useInputDevice)
 			//printf("reset sample rate(Input) to %f\n",mOutputDevice.mFormat.mSampleRate);
             status = mInputDevice.SetSampleRate(mOutputDevice.mFormat.mSampleRate);
         }
-        printf("reset sample rate\n");
+        printf("reset sample rate to %f\n", mOutputDevice.mFormat.mSampleRate);
 	}
     
     //printf("Now Input sampleRate = %f\n", mInputDevice.mFormat.mSampleRate);
@@ -161,10 +161,13 @@ void	AudioThruEngine::Start()
 			return;
 		}*/
         
-        //Change SampleRate of SoundFlower sometimes crashes iTunes, so we change sample rate of output rather than input.  
-        MatchSampleRate(true);
+        //Change SampleRate of SoundFlower sometimes crashes iTunes(might be bug of iTunes),
+        //so we change sample rate of output rather than input... but Some Audio I/F
+        //support limited sampling rate setting,, so what should we do?
+        MatchSampleRate(/*true*/false);
         if (mInputDevice.mFormat.mSampleRate != mOutputDevice.mFormat.mSampleRate) {
- 			printf("Error - sample rate mismatch: %f / %f\n", mInputDevice.mFormat.mSampleRate, mOutputDevice.mFormat.mSampleRate);           
+ 			printf("Error - sample rate mismatch: %f / %f\n", mInputDevice.mFormat.mSampleRate, mOutputDevice.mFormat.mSampleRate);
+            return;
         }
 	}
 
@@ -224,7 +227,7 @@ void	AudioThruEngine::Start()
     
     UInt32 totalWait = 0;
 	while (mInputProcState != kRunning || mOutputProcState != kRunning){
-        if (totalWait > 1000 * 1000){
+        if (totalWait > 1000 * 2000){
             //for some reson, failed to run!
             mRunning = false;
             printf("give up to start.\n");

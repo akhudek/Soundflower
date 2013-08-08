@@ -25,4 +25,35 @@
     // Drawing code here.
 }
 
+- (NSSlider *)slider
+{
+    return mSlider;
+}
+
+- (NSTextField *)label
+{
+    return mLabel;
+}
+
+- (void)setEnabled:(BOOL)enabled
+{
+    [mSlider setEnabled:enabled];
+    [mLabel setEnabled:enabled];
+    if (!enabled){
+        [mSlider setFloatValue:0.0f];
+        [mLabel setStringValue:@""];
+    }
+}
+
+- (void)setScalar:(float)scalar
+{
+    [mSlider setFloatValue:scalar];
+}
+- (void)setDB:(float)db
+{
+    NSString *str = [NSString stringWithFormat:@"%3.2f[dB]",db];
+    [mLabel setStringValue:str];
+    //[str release];
+}
+
 @end
