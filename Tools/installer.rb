@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -wKU
+#!/usr/bin/env ruby -wU
 
 ###################################################################
 # make an installer for Soundflower
