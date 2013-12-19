@@ -7,7 +7,7 @@
 
 Build/
 todo.txt
-*.log  # Will exclude all .log files
+*.log
 
 # Xcode User Data
 *.mode1v3
