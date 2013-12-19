@@ -41,7 +41,7 @@ configuration = "Deployment" if configuration == "dep"
 puts "  Building the new Soundflower.kext with Xcode"
 
 Dir.chdir("#{@source}")
-Open3.popen3("xcodebuild -project Soundflower.xcodeproj -target SoundflowerDriver -configuration #{configuration} clean build") do |stdin, stdout, stderr|
+Open3.popen3("xcodebuild -project Soundflower.xcodeproj -target Soundflower -configuration #{configuration} clean build") do |stdin, stdout, stderr|
   out = stdout.read
   err = stderr.read
 end

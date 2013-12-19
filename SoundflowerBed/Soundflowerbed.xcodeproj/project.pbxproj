@@ -299,7 +299,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEPLOYMENT_LOCATION = YES;
-				DSTROOT = /;
+				DSTROOT = "$(SRCROOT)/../Build/InstallerRoot";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -308,7 +308,6 @@
 				INSTALL_PATH = /Applications/Soundflower;
 				PRODUCT_NAME = Soundflowerbed;
 				SECTORDER_FLAGS = "";
-				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = (
 					"-Wmost",
 					"-Wno-four-char-constants",
@@ -324,13 +323,12 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEPLOYMENT_LOCATION = YES;
-				DSTROOT = /;
+				DSTROOT = "$(SRCROOT)/../Build/InstallerRoot";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Applications/Soundflower;
 				PRODUCT_NAME = Soundflowerbed;
 				SECTORDER_FLAGS = "";
-				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = (
 					"-Wmost",
 					"-Wno-four-char-constants",
