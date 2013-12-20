@@ -3,6 +3,8 @@
 ###################################################################
 # build Soundflower, install it, and start it
 # installs to /System/Library/Extensions
+# do NOT install to /Library/Extensions -- on OS 10.9 this location requires kext to be signed,
+#     and a signed kext will NOT load on OS 10.8 or earlier
 # requires admin permissions and will ask for your password
 ###################################################################
 
@@ -46,8 +48,8 @@ Open3.popen3("xcodebuild -project Soundflower.xcodeproj -target Soundflower -con
   err = stderr.read
 end
 
-`sudo chown -R root #{@svn_root}/Build/InstallerRoot/Library/Extensions/Soundflower.kext`
-`sudo chgrp -R wheel #{@svn_root}/Build/InstallerRoot/Library/Extensions/Soundflower.kext`
+`sudo chown -R root #{@svn_root}/Build/InstallerRoot/System/Library/Extensions/Soundflower.kext`
+`sudo chgrp -R wheel #{@svn_root}/Build/InstallerRoot/System/Library/Extensions/Soundflower.kext`
 
 #if /BUILD SUCCEEDED/.match(out)
 #  puts "    BUILD SUCCEEDED"

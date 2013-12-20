@@ -242,10 +242,8 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_GROUP = wheel;
 				INSTALL_OWNER = root;
-				INSTALL_PATH = /Library/Extensions;
+				INSTALL_PATH = /System/Library/Extensions;
 				MODULE_NAME = com.Cycling74.driver.Soundflower;
-				MODULE_START = Soundflower_start;
-				MODULE_STOP = Soundflower_stop;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = kext;
@@ -267,10 +265,8 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_GROUP = wheel;
 				INSTALL_OWNER = root;
-				INSTALL_PATH = /Library/Extensions;
+				INSTALL_PATH = /System/Library/Extensions;
 				MODULE_NAME = com.Cycling74.driver.Soundflower;
-				MODULE_START = Soundflower_start;
-				MODULE_STOP = Soundflower_stop;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = kext;
