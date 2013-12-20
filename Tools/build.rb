@@ -23,7 +23,6 @@ if(ARGV.length != 1)
 end
 
 configuration = ARGV[0]
-version = ARGV[1]
 out = nil
 err = nil
 
@@ -35,6 +34,7 @@ err = nil
 configuration = "Development" if configuration == "dev"
 configuration = "Deployment" if configuration == "dep"
 
+`sudo rm -rf #{@svn_root}/Build/InstallerRoot`
 
 ###################################################################
 
@@ -46,6 +46,8 @@ Open3.popen3("xcodebuild -project Soundflower.xcodeproj -target Soundflower -con
   err = stderr.read
 end
 
+`sudo chown -R root #{@svn_root}/Build/InstallerRoot/Library/Extensions/Soundflower.kext`
+`sudo chgrp -R wheel #{@svn_root}/Build/InstallerRoot/Library/Extensions/Soundflower.kext`
 
 #if /BUILD SUCCEEDED/.match(out)
 #  puts "    BUILD SUCCEEDED"

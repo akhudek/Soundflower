@@ -15,12 +15,9 @@ include REXML
 libdir = "."
 Dir.chdir libdir        # change to libdir so that requires work
 
-@version = "9.9.9"
 @svn_root = ".."
 Dir.chdir @svn_root
 @svn_root = Dir.pwd
-@build_folder = "#{@svn_root}/Build/Soundflower-#{@version}"
-@installer_root = "#{@svn_root}/Build/InstallerRoot"
 
 
 ###################################################################
@@ -91,14 +88,15 @@ end
 ###################################################################
 
 create_logs()
+
+@installer_root = "#{@svn_root}/Build/InstallerRoot"
 @version = getversion()
+@build_folder = "#{@svn_root}/Build/Soundflower-#{@version}"
 
 puts "  Creating installer directory structure..."
 cmd("rm -rfv \"#{@build_folder}\"")                       # remove an old temp dir if it exists
 cmd("mkdir -pv \"#{@build_folder}\"")                     # now make a clean one, and build dir structure in it
 
-#cmd("mkdir -pv \"#{@installer_root}\"/Applications/Soundflower")
-#cmd("mkdir -pv \"#{@installer_root}\"/System/Library/Extensions/")
 cmd("cp \"#{@svn_root}/Tools/Uninstall Soundflower.scpt\"           \"#{@installer_root}\"/Applications/Soundflower")
 cmd("cp \"#{@svn_root}/License.txt\"                                \"#{@installer_root}\"/Applications/Soundflower")
 cmd("cp \"#{@svn_root}/Installer/ReadMe.rtf\"                       \"#{@installer_root}\"/Applications/Soundflower")
@@ -106,12 +104,7 @@ cmd("cp \"#{@svn_root}/SoundflowerBed/Soundflowerbed README.rtf\"   \"#{@install
 
 puts "  Building Package -- this could take a while..."
 cmd("rm -rfv \"#{@svn_root}/Installers/Soundflower.pkg\"")
-#cmd("packagemaker --verbose --root \"#{@svn_root}/Installer/root\" --id com.cycling74.soundflower --out \"#{@svn_root}/Installer/Soundflower/Soundflower.pkg\" --version #{@version} --title Soundflower --resources \"#{@svn_root}/Installer/Resources\" --target 10.4 --domain system --root-volume-only")
-#cmd("packagemaker --verbose --doc \"#{@svn_root}/Installer/Soundflower.pmdoc\" --out \"#{@build_folder}/Soundflower-unsigned.pkg\" --certificate \"3rd Party Mac Developer Application: Cycling '74\"")
-puts `pkgbuild --root \"#{@installer_root}\" --identifier com.cycling74.soundflower --version #{@version} --install-location "/" \"#{@build_folder}/Soundflower-unsigned.pkg\" --ownership preserve  --sign \"3rd Party Mac Developer Installer: Cycling '74\"`
-
-#cmd("productsign --sign \"3rd Party Mac Developer Installer: Cycling '74\" \"#{@build_folder}/Soundflower-unsigned.pkg\" \"#{@build_folder}/Soundflower.pkg\"")
-cmd("rm -rf \"#{@build_folder}/Soundflower-unsigned.pkg\"")
+puts `pkgbuild --root \"#{@installer_root}\" --identifier com.cycling74.soundflower --version #{@version} --install-location "/" \"#{@build_folder}/Soundflower.pkg\" --ownership preserve  --sign \"Developer ID Installer: Cycling '74\"`
 
 puts "  Copying readme, license, etc...."
 cmd("cp \"#{@svn_root}/License.txt\" \"#{@build_folder}\"")
