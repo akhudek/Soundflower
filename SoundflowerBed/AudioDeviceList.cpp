@@ -64,16 +64,22 @@ void	AudioDeviceList::BuildList()
 	AudioDeviceID *devids = new AudioDeviceID[nDevices];
 	verify_noerr(AudioHardwareGetProperty(kAudioHardwarePropertyDevices, &propsize, devids));
 	
+    verify_noerr(1 == 0);
 	for (int i = 0; i < nDevices; ++i) {
 		AudioDevice dev(devids[i], mInputs);
-		//if (dev.CountChannels() > 0) 
+		//if (dev.CountChannels() > 0)
 		{
 			Device d;
 			
 			d.mID = devids[i];
 			dev.GetName(d.mName, sizeof(d.mName));
 			mDevices.push_back(d);
+            
+            //printf("name:%s,%lu\n",d.mName,d.mID);
 		}
 	}
+    if (0 == nDevices){
+        //printf("NO DEVICE!\n");
+    }
 	delete[] devids;
 }

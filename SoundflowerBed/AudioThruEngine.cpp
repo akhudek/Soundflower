@@ -97,6 +97,7 @@ void	AudioThruEngine::SetInputDevice(AudioDeviceID input)
 
 void	AudioThruEngine::SetOutputDevice(AudioDeviceID output)
 {
+    //printf("SetOutputDevice id = %lu\n",output);
 	Stop();
 	mOutputDevice.Init(output, false);
 	SetBufferSize(mBufferSize);
@@ -129,13 +130,18 @@ OSStatus AudioThruEngine::MatchSampleRate(bool useInputDevice)
 	
 	if (mInputDevice.mFormat.mSampleRate != mOutputDevice.mFormat.mSampleRate)
 	{
-		if (useInputDevice)
-			status = mOutputDevice.SetSampleRate(mInputDevice.mFormat.mSampleRate);
-		else
-			status = mInputDevice.SetSampleRate(mOutputDevice.mFormat.mSampleRate);
-			
-		printf("reset sample rate\n");	
+		if (useInputDevice){
+			//printf("reset sample rate(Output) to %f\n",mInputDevice.mFormat.mSampleRate);
+            status = mOutputDevice.SetSampleRate(mInputDevice.mFormat.mSampleRate);
+        }else{
+			//printf("reset sample rate(Input) to %f\n",mOutputDevice.mFormat.mSampleRate);
+            status = mInputDevice.SetSampleRate(mOutputDevice.mFormat.mSampleRate);
+        }
+        printf("reset sample rate to %f\n", mOutputDevice.mFormat.mSampleRate);
 	}
+    
+    //printf("Now Input sampleRate = %f\n", mInputDevice.mFormat.mSampleRate);
+    //printf("Now Output sampleRate = %f\n", mOutputDevice.mFormat.mSampleRate);
 
 	return status;
 }
@@ -150,10 +156,19 @@ void	AudioThruEngine::Start()
 
 	// $$$ should do some checks on the format/sample rate matching
 	if (mInputDevice.mFormat.mSampleRate != mOutputDevice.mFormat.mSampleRate) {
-		if (MatchSampleRate(false)) {
+		/*if (MatchSampleRate(false)) {
 			printf("Error - sample rate mismatch: %f / %f\n", mInputDevice.mFormat.mSampleRate, mOutputDevice.mFormat.mSampleRate);
 			return;
-		}
+		}*/
+        
+        //Change SampleRate of SoundFlower sometimes crashes iTunes(might be bug of iTunes),
+        //so we change sample rate of output rather than input... but Some Audio I/F
+        //support limited sampling rate setting,, so what should we do?
+        MatchSampleRate(/*true*/false);
+        if (mInputDevice.mFormat.mSampleRate != mOutputDevice.mFormat.mSampleRate) {
+ 			printf("Error - sample rate mismatch: %f / %f\n", mInputDevice.mFormat.mSampleRate, mOutputDevice.mFormat.mSampleRate);
+            return;
+        }
 	}
 
 
@@ -208,12 +223,39 @@ void	AudioThruEngine::Start()
 //		mOutputProcState = kRunning;
 //	else
 		
-	
-	while (mInputProcState != kRunning || mOutputProcState != kRunning)
-		usleep(1000);
+
+    
+    UInt32 totalWait = 0;
+	while (mInputProcState != kRunning || mOutputProcState != kRunning){
+        if (totalWait > 1000 * 2000){
+            //for some reson, failed to run!
+            mRunning = false;
+            printf("give up to start.\n");
+            
+            verify_noerr (AudioDeviceStop(mInputDevice.mID, InputIOProc));
+            verify_noerr (AudioDeviceRemoveIOProc(mInputDevice.mID, InputIOProc));
+            
+            verify_noerr (AudioDeviceStop(mOutputDevice.mID, mOutputIOProc));
+            verify_noerr (AudioDeviceRemoveIOProc(mOutputDevice.mID, mOutputIOProc));
+            
+            mInputProcState = kOff;
+            mOutputProcState = kOff;
+            
+            mRunning = false;
+            break;
+        }
+        usleep(1000);
+        totalWait += 1000;
+    }
 	
 //	usleep(12000);
 	ComputeThruOffset();
+    
+    if (mRunning){
+        //printf("succeeded to start\n");
+    }else{
+        //printf("failed to start\n");
+    }
 }
 
 void	AudioThruEngine::ComputeThruOffset()
@@ -246,9 +288,21 @@ bool	AudioThruEngine::Stop()
 	mInputProcState = kStopRequested;
 	mOutputProcState = kStopRequested;
 	
-	while (mInputProcState != kOff || mOutputProcState != kOff)
+    UInt32 totalWait = 0;
+	while (mInputProcState != kOff || mOutputProcState != kOff){
+        if (totalWait > 1000 * 1000){
+            //In case of Device disconnected, This will happen.
+            printf("given up to stop\n");
+            AudioDeviceStop(mInputDevice.mID, InputIOProc);
+            mInputProcState = kOff;
+            AudioDeviceStop(mOutputDevice.mID, mOutputIOProc);
+            mOutputProcState = kOff;
+            break;
+        }
 		usleep(5000);
-
+        totalWait += 5000;
+    }
+    
 	AudioDeviceRemoveIOProc(mInputDevice.mID, InputIOProc);
 	AudioDeviceRemoveIOProc(mOutputDevice.mID, mOutputIOProc);
 	
