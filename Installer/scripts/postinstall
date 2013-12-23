@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "touch the extensions directory"
+touch /System/Library/Extensions
+kextload /System/Library/Extensions/Soundflower.kext

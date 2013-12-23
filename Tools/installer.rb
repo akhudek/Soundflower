@@ -103,8 +103,7 @@ cmd("cp \"#{@svn_root}/Installer/ReadMe.rtf\"                       \"#{@install
 cmd("cp \"#{@svn_root}/SoundflowerBed/Soundflowerbed README.rtf\"   \"#{@installer_root}\"/Applications/Soundflower")
 
 puts "  Building Package -- this could take a while..."
-cmd("rm -rfv \"#{@svn_root}/Installers/Soundflower.pkg\"")
-puts `pkgbuild --root \"#{@installer_root}\" --identifier com.cycling74.soundflower --version #{@version} --install-location "/" \"#{@build_folder}/Soundflower.pkg\" --ownership preserve  --sign \"Developer ID Installer: Cycling '74\"`
+puts `pkgbuild --root \"#{@installer_root}\" --identifier com.cycling74.soundflower --version #{@version} --install-location "/" \"#{@build_folder}/Soundflower.pkg\" --ownership preserve  --scripts \"#{@svn_root}/Installer/scripts\" --sign \"Developer ID Installer: Cycling '74\"`
 
 puts "  Copying readme, license, etc...."
 cmd("cp \"#{@svn_root}/License.txt\" \"#{@build_folder}\"")
