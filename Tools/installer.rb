@@ -112,7 +112,7 @@ cmd("sudo cp \"#{@svn_root}/Installer/ReadMe.rtf\" \"#{@build_folder}\"")
 cmd("sudo cp \"#{@svn_root}/Tools/Uninstall Soundflower.scpt\" \"#{@build_folder}\"")
 
 puts "  Creating Disk Image..."
-cmd("sudo rm -rfv \"#{@svn_root}/Installer/Soundflower-#{@version}.dmg\"")
+cmd("sudo rm -rfv \"#{@svn_root}/Build/Soundflower-#{@version}.dmg\"")
 cmd("sudo hdiutil create -srcfolder \"#{@build_folder}\" \"#{@svn_root}/Build/Soundflower-#{@version}.dmg\"")
 
 puts "  All done!"
