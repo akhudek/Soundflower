@@ -50,6 +50,7 @@ end
 
 `sudo chown -R root  #{@svn_root}/Build/InstallerRoot/Library/Extensions/Soundflower.kext`
 `sudo chgrp -R wheel #{@svn_root}/Build/InstallerRoot/Library/Extensions/Soundflower.kext`
+`sudo chmod -R 755   #{@svn_root}/Build/InstallerRoot/Library/Extensions/Soundflower.kext`
 
 #if /BUILD SUCCEEDED/.match(out)
 #  puts "    BUILD SUCCEEDED"
