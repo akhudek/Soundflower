@@ -241,6 +241,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_GROUP = wheel;
 				INSTALL_OWNER = root;
+				INSTALL_PATH = /System/Library/Extensions;
 				MODULE_NAME = com.Cycling74.driver.Soundflower;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -262,6 +263,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_GROUP = wheel;
 				INSTALL_OWNER = root;
+				INSTALL_PATH = /System/Library/Extensions;
 				MODULE_NAME = com.Cycling74.driver.Soundflower;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
