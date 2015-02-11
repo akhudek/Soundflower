@@ -1,0 +1,5 @@
+language: objective-c
+xcode_project: Source/Soundflower.xcodeproj
+xcode_scheme: Soundflower
+
+
