@@ -2,6 +2,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "HelpWindowController.h"
+#import "VolumeView.h"
+#import "VolumeViewController.h"
 #include "AudioDeviceList.h"
 
 
@@ -15,6 +17,7 @@
 	NSMenu			*m16chBuffer;
     
 	BOOL			menuItemVisible;
+    int             m2StartIndex;   //Menu Index of "None"
 	int				m16StartIndex;
 	
 	NSMenuItem		*mCur2chDevice;
@@ -22,8 +25,11 @@
 	NSMenuItem		*mCur2chBufferSize;
 	NSMenuItem		*mCur16chBufferSize;
 	
-	NSMenuItem		*mSuspended2chDevice;
-	NSMenuItem		*mSuspended16chDevice;
+	//NSMenuItem		*mSuspended2chDevice;
+	//NSMenuItem		*mSuspended16chDevice;
+    
+    AudioDeviceID   mSuspended2chDeviceID;
+    AudioDeviceID   mSuspended16chDeviceID;
 	
 	AudioDeviceID				mSoundflower2Device;
 	AudioDeviceID				mSoundflower16Device;
@@ -33,10 +39,13 @@
 	UInt32 mNchnls2;
 	UInt32 mNchnls16;
 	
-	UInt32 mMenuID2[64];
-	UInt32 mMenuID16[64];
+	AudioDeviceID mMenuID2[64];
+	AudioDeviceID mMenuID16[64];
 	
 	IBOutlet HelpWindowController *mAboutController;
+    //IBOutlet VolumeView *mVolumeView;
+    id mVolumeViewController2ch;
+    id mVolumeViewController16ch;
 }
 
 - (IBAction)suspend;
@@ -47,6 +56,7 @@
 - (IBAction)srChanged2chOutput;
 - (IBAction)srChanged16chOutput;
 - (IBAction)checkNchnls;
+- (IBAction)volChanged2ch;
 
 - (IBAction)refreshDevices;
 

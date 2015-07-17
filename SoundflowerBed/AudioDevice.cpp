@@ -81,11 +81,93 @@ OSStatus	AudioDevice::SetSampleRate(Float64 sr)
 	OSStatus err = AudioDeviceSetProperty(mID, NULL, 0, mIsInput, kAudioDevicePropertyStreamFormat, propsize, &mFormat);
 
 	// now re-read to see what actual value is
-	UpdateFormat();
+	//printf("pre update = %f\n", mFormat.mSampleRate);
+    if (noErr != err){
+        UpdateFormat();
+    }
+    //printf("post update = %f\n", mFormat.mSampleRate);
 	
 	return err;
 }
 
+bool    AudioDevice::IsVolumeAvailableForMaster()
+{
+    //Assume all device which support getting Volume also support setting Volume.
+    Boolean isWritable = false;
+    verify_noerr(AudioDeviceGetPropertyInfo(mID,0,false,kAudioDevicePropertyVolumeScalar,NULL,&isWritable));
+    return isWritable;
+}
+
+bool    AudioDevice::IsVolumeAvailableForChannels()
+{
+    Boolean isWritable = false;
+    verify_noerr(AudioDeviceGetPropertyInfo(mID,1,false,kAudioDevicePropertyVolumeScalar,NULL,&isWritable));
+    return isWritable;
+}
+
+
+void    AudioDevice::SetVolumeScalar(float val)
+{
+    UInt32 propSize = sizeof(Float32);
+    Float32 volumeScalar = val;
+    
+    /*
+     Some devices support volume control only via master channel.
+     Some devices support volume control only via each channel.
+     Some devices support both of master or channels.
+    */
+    
+    if(IsVolumeAvailableForMaster())
+    {
+        verify_noerr(AudioDeviceSetProperty(mID, NULL, 0/*master channel*/, false, kAudioDevicePropertyVolumeScalar, propSize, &volumeScalar));
+    }else if(IsVolumeAvailableForChannels())
+    {
+        int channel_num = this->CountChannels();
+        for (int i = 0 ; i < channel_num; i++){
+            verify_noerr(AudioDeviceSetProperty(mID, NULL, 1 + i, false, kAudioDevicePropertyVolumeScalar, propSize, &volumeScalar));
+        }
+    }else{
+        //No Support for kAudioDevicePropertyVolumeScalar
+    }
+}
+
+float   AudioDevice::GetVolumeScalar()
+{
+    UInt32 propSize = sizeof(Float32);
+    Float32 volumeScalar = 0;
+    
+    if(IsVolumeAvailableForMaster())
+    {
+        verify_noerr(AudioDeviceGetProperty(mID, 0/*master channel*/, false, kAudioDevicePropertyVolumeScalar, &propSize, &volumeScalar));
+    }else if(IsVolumeAvailableForChannels())
+    {
+        //we take value from channel 1
+        verify_noerr(AudioDeviceGetProperty(mID, 1, false, kAudioDevicePropertyVolumeScalar, &propSize, &volumeScalar));
+        
+    }else{
+        //No Support for kAudioDevicePropertyVolumeScalar
+    }
+    return volumeScalar;
+}
+
+float   AudioDevice::GetVolumeDB()
+{
+    UInt32 propSize = sizeof(Float32);
+    Float32 volumeDB = 0;
+    
+    if(IsVolumeAvailableForMaster())
+    {
+        verify_noerr(AudioDeviceGetProperty(mID, 0/*master channel*/, false, kAudioDevicePropertyVolumeDecibels, &propSize, &volumeDB));
+    }else if(IsVolumeAvailableForChannels())
+    {
+        //we take value from channel 1
+        verify_noerr(AudioDeviceGetProperty(mID, 1, false, kAudioDevicePropertyVolumeDecibels, &propSize, &volumeDB));
+        
+    }else{
+        //No Support for kAudioDevicePropertyVolumeDecibels
+    }
+    return volumeDB;
+}
 
 int		AudioDevice::CountChannels()
 {

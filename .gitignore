@@ -7,7 +7,14 @@
 
 Build/
 todo.txt
-*.log  # Will exclude all .log files
+*.log
+
+# Xcode User Data
 *.mode1v3
 *.pbxuser
+*.perspective*
+xcuserdata
+*.xcworkspace
+
 build
+.DS_Store

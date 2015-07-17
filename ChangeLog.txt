@@ -1,4 +1,2 @@
 The Change Log for Soundflower is located at:
-	http://code.google.com/p/soundflower/wiki/ChangeLog
-	
-	
+	https://github.com/RogueAmoeba/Soundflower/wiki/Change-Log
